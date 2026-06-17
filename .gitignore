@@ -22,9 +22,6 @@ redis_data/
 
 # Dependency directories
 vendor/
-go.sum
-go.mod
-
 # IDE specific files
 .idea/
 .vscode/
