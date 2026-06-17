@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: dyn_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-dynamic_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: dyn_app
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: ${APP_PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-dynamic_db}
+      DB_SSLMODE: disable
+
+      SOURCE1: ${SOURCE1}
+      SOURCE2: ${SOURCE2}
+      SOURCE3: ${SOURCE3}
+      SOURCE4: ${SOURCE4}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
